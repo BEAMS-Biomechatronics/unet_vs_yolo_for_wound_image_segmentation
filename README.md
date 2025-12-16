@@ -99,8 +99,6 @@ Script generating publication-ready figures used in the associated manuscript.
 
 ## Dependencies
 
-All dependencies required to run the code are listed in `requirements.txt`.
-
 Main libraries include:
 - Python
 - TensorFlow / Keras
