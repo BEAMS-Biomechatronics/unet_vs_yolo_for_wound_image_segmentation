@@ -1,114 +1,141 @@
-This repository provides the full reproducible pipeline used in our study for the segmentation of chronic wounds using three model families:
+# Image segmentation with Unet and YOLOv8/11 with Python
+***This code is for research purposes only.***
 
-U-Net (TensorFlow/Keras)
+This repository contains the code associated with the publication: *paper to be submitted*.
 
-YOLOv8-seg (Ultralytics)
-YOLO11-seg (Ultralytics)
+## Overview
 
-The codebase includes: cross-validation, training, inference, per-threshold metric computation (IoU, Precision, Recall, Dice), aggregated results, and publication-ready plots.
+### ***Unet***
+### `unet_model.py`
+Definition of the U-Net architecture used for binary segmentation of chronic wound images.  
+The model follows a classical encoder–decoder structure with skip connections and a sigmoid output layer.
 
-This repository implements all steps required for transparency and reproducibility, as recommended for clinical machine-learning workflows.
+### `train.py`
+Main training script for the U-Net pipeline.  
+This script performs 5-fold cross-validation and handles model training and validation.
+
+This is where you need to specify:
+
+(1) all parameters concerning the training procedure:
+- *img_size*: input image resolution
+- *batch_size*: batch size
+- *epochs*: maximum number of epochs
+- *learning_rate*: initial learning rate
+- *optimizer*: optimization algorithm
+- *patience*: early stopping patience
+
+(2) the specifics regarding your dataset:
+- *data_path*: path to the dataset
+- *folds*: number of cross-validation folds
+- *train/val split*: handled per fold
+- *save_path*: folder in which trained weights are saved
+
+The data for each fold should be organised into:
+- *images*: RGB wound images
+- *masks*: binary segmentation masks
+
+---
+
+### `predict.py`
+Script handling inference with the trained U-Net models.  
+It generates probability maps and computes segmentation metrics.
+
+Outputs include:
+- per-image metrics: IoU, Precision, Recall, Dice
+- threshold-based evaluation (0.1 → 0.9)
+- CSV files saved per fold
+
+---
+
+### `average.py`
+Script aggregating segmentation metrics across the 5 folds.  
+It produces global performance values for each metric.
+
+---
+
+### `plot.py`
+Script generating visualisations of the segmentation performance, including metric evolution across thresholds.
+
+---
+---
+
+### ***YOLO***
+### `training.py`
+Main training script for YOLO-based segmentation models (YOLOv8 and YOLO11).  
+It performs 5-fold cross-validation using Ultralytics implementations.
+
+This is where you need to specify:
+- *model type*: YOLOv8 or YOLO11
+- *model size*: n, s, m, l, or x
+- *img_size*: input resolution
+- *batch_size*
+- *epochs*
+- *dataset YAML files*
+
+Training parameters and notes are saved in `yolo_training_info.txt`.
+
+---
+
+### `predict.py`
+Inference script for YOLOv8 and YOLO11 segmentation models.  
+For each fold, it:
+- loads the best trained model
+- runs inference on test images
+- aggregates segmentation masks
+- applies thresholds from 0.1 to 0.9
+- computes IoU, Precision, Recall, Dice, TP, FP, TN, FN
+
+---
+
+### `average_unet_yolo.py`
+Script aggregating YOLO segmentation metrics across folds to produce global performance results.
+
+---
+
+### `plotarticle.py`
+Script generating publication-ready figures used in the associated manuscript.
+
+---
+
+## Dependencies
+
+All dependencies required to run the code are listed in `requirements.txt`.
+
+Main libraries include:
+- Python
+- TensorFlow / Keras
+- PyTorch
+- Ultralytics YOLO
+- NumPy, Pandas, Matplotlib
+
+---
+
+## Usage
+
+1. Organise the datasets according to the required U-Net or YOLO structure
+2. Run the training scripts for the selected model family
+3. Perform inference and metric computation
+4. Aggregate results and generate figures
+
+Each pipeline (U-Net and YOLO) can be executed independently.
+
+---
+
+## Contributors
+
+Indrani Marchal
+
+---
+
+## License
+
+If you use this algorithm for a publication (in a journal, in a conference, etc.), please cite the related publications (see below). The license attached to this toolbox is GPL v2, see https://www.gnu.org/licenses/gpl-2.0.txt. From https://www.gnu.org/licenses/gpl-2.0.html, it implies: This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
 
 
-Structure
-.
-├── unet/
-│   ├── unet_model.py                 # U-Net architecture                 :contentReference[oaicite:0]{index=0}
-│   ├── train.py                      # U-Net cross-validation training     :contentReference[oaicite:1]{index=1}
-│   ├── predict.py                    # U-Net inference + metrics           :contentReference[oaicite:2]{index=2}
-│   ├── average.py                    # Average metrics across folds        :contentReference[oaicite:3]{index=3}
-│   ├── plot.py                       # IoU / ROC plot utilities            :contentReference[oaicite:4]{index=4}
-│
-├── yolo/
-│   ├── training.py                   # YOLOv8/YOLO11 training (5-fold)     :contentReference[oaicite:5]{index=5}
-│   ├── predict.py                    # YOLO inference + metrics            :contentReference[oaicite:6]{index=6}
-│   ├── average_metric.py             # YOLO metric aggregation             :contentReference[oaicite:7]{index=7}
-│   ├── plots.py                      # Simple metric plots                 :contentReference[oaicite:8]{index=8}
-│   ├── plotarticle.py                # Publication-ready plots             :contentReference[oaicite:9]{index=9}
-│   ├── yolo_training_info.txt        # Training parameters + notes         :contentReference[oaicite:10]{index=10}
-│
-├── notebooks/
-│   └── Inference_with_Mask2Former.ipynb   # Baseline comparison             :contentReference[oaicite:11]{index=11}
-│
-├── requirements.txt
-└── README.md
+---
 
+## Citation
 
-Dataset organisation
-For U_Net
-dataset/
-├── fold_1/
-│   ├── train/images
-│   ├── train/masks
-│   ├── val/images
-│   ├── val/masks
-│   └── test/images
-│       └── test/masks
-├── fold_2/
-...
-
-For YOLO
-dataset_yolo/
-├── fold_1.yaml
-├── fold_2.yaml
-...
-path: /path/to/dataset
-train: train/images
-val: val/images
-test: test/images
-names:
-  0: wound
-
-U_Net pipeline          
-unet_model.py
-
-A classical encoder–decoder architecture:
-  Downsampling blocks (conv–conv–maxpool)
-  Bottleneck
-  Upsampling blocks with skip-connections
-  Sigmoid output mask
-
-Train : python unet/train.py
-Features:
-
-Sequential training of folds 1–5
-Data generators handling resizing & normalisation
-Training metrics: Accuracy, MeanIoU
-Saves weights:unet_weights_combined_AZHtest_fold_1.h5
-
-Metrics : python unet/predict.py
-Outputs for each fold:
-Per-image metrics (IoU, Precision, Recall, Dice)
-Per-threshold results (0.1 → 0.9)
-CSV files saved per fold
-
-average_metric__per_fold: python unet/average.py
-
-Visualisation : python unet/plot.py
-
-_______________________________________________________________________________
-Pipeline (YOLO)
-Supported models:
-
-YOLOv8: n, s, m, l, x
-YOLO11: n, s, m, l, x
-All models use segmentation heads.
-
-Train : python yolo/training.py
-Features:
-5-fold cross-validation
-Training parameters recorded in yolo_training_info.txt
-
-Metric: python yolo/predict.py
-or each fold:
-Loads YOLO best.pt
-Runs inference on test images
-Aggregates mask channels
-Applies thresholds 0.1 → 0.9
-Computes:IoU; Precision; Recall; Dice; TP / FP / TN / FN
-
-average metrics : python yolo/average_metric.py
-
-visualisation : python yolo/plotarticle.py
+If you use this code or data in your research, please cite the following paper: *paper to be submitted*.
 
 
