@@ -1,0 +1,18 @@
+Version used : Ultralytics YOLOv8.0.183  Python-3.8.0 torch-1.10.1+cu113 CUDA:0 (NVIDIA RTX A4000, 16376MiB)
+
+Params : https://docs.ultralytics.com/modes/train/#arguments
+
+epochs=250, patience=50, batch=32, imgsz=640, save=True, save_period=50, cache=False, device=0, workers=8
+
+deterministic training :
+
+Upgrade to torch>=2.0.0 for deterministic training. From https://pytorch.org/docs/stable/notes/randomness.html :
+
+Completely reproducible results are not guaranteed across PyTorch releases, individual commits, or different platforms. Furthermore, results may not be reproducible between CPU and GPU executions, even when using identical seeds.
+
+However, there are some steps you can take to limit the number of sources of nondeterministic behavior for a specific platform, device, and PyTorch release. First, you can control sources of randomness that can cause multiple executions of your application to behave differently. Second, you can configure PyTorch to avoid using nondeterministic algorithms for some operations, so that multiple calls to those operations, given the same inputs, will produce the same result.
+
+WARNING
+
+Deterministic operations are often slower than nondeterministic operations, so single-run performance may decrease for your model. However, determinism may save time in development by facilitating experimentation, debugging, and regression testing.
+
